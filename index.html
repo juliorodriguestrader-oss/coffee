@@ -1,13 +1,1060 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Cadastro de Alunos</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #2a3347;
+    --accent: #4f9cf9;
+    --accent2: #7c5cbf;
+    --green: #3fb950;
+    --red: #f85149;
+    --orange: #e3a84e;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #4d5566;
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,156,249,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,156,249,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: #3a4460; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #70b0ff; box-shadow: 0 0 20px rgba(79,156,249,0.3); }
+
+  .btn-success {
+    background: rgba(63,185,80,0.15);
+    color: var(--green);
+    border: 1px solid rgba(63,185,80,0.3);
+  }
+  .btn-success:hover { background: rgba(63,185,80,0.25); }
+
+  .btn-danger {
+    background: rgba(248,81,73,0.15);
+    color: var(--red);
+    border: 1px solid rgba(248,81,73,0.3);
+  }
+  .btn-danger:hover { background: rgba(248,81,73,0.25); }
+
+  .btn-orange {
+    background: rgba(227,168,78,0.15);
+    color: var(--orange);
+    border: 1px solid rgba(227,168,78,0.3);
+  }
+  .btn-orange:hover { background: rgba(227,168,78,0.25); }
+
+  .btn-purple {
+    background: rgba(124,92,191,0.15);
+    color: #a78bfa;
+    border: 1px solid rgba(124,92,191,0.3);
+  }
+  .btn-purple:hover { background: rgba(124,92,191,0.25); }
+
+  /* MAIN LAYOUT */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 28px;
+    width: fit-content;
+  }
+
+  .tab {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+    font-family: 'Sora', sans-serif;
+  }
+
+  .tab.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(79,156,249,0.3);
+  }
+
+  .tab:not(.active):hover { color: var(--text); background: var(--surface2); }
+
+  /* PANEL */
+  .panel {
+    display: none;
+    animation: fadeIn 0.25s ease;
+  }
+  .panel.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* FORM CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    width: 3px;
+    height: 18px;
+    background: linear-gradient(var(--accent), var(--accent2));
+    border-radius: 2px;
+  }
+
+  /* FORM GRID */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group.half { grid-column: span 2; }
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  input, select, textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79,156,249,0.12);
+  }
+
+  input::placeholder { color: var(--text3); }
+
+  select option { background: var(--surface); }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* FORM ACTIONS */
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  /* PHOTO UPLOAD */
+  .photo-upload {
+    width: 100px;
+    height: 120px;
+    background: var(--bg);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 11px;
+    color: var(--text3);
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .photo-upload:hover { border-color: var(--accent); color: var(--accent); }
+  .photo-upload img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+  .photo-upload input { display: none; }
+
+  /* ALUNO HEADER */
+  .aluno-header {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th {
+    background: var(--surface2);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:hover td { background: rgba(79,156,249,0.04); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .badge-green { background: rgba(63,185,80,0.15); color: var(--green); }
+  .badge-red   { background: rgba(248,81,73,0.15);  color: var(--red); }
+  .badge-blue  { background: rgba(79,156,249,0.15); color: var(--accent); }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 10px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .name-cell { display: flex; align-items: center; }
+
+  /* SEARCH BAR */
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .search-bar input {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .stat-label { font-size: 12px; color: var(--text2); }
+  .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+  .stat-value.blue { color: var(--accent); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.orange { color: var(--orange); }
+  .stat-value.purple { color: #a78bfa; }
+
+  /* TOAST */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .toast-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.3s ease;
+    box-shadow: var(--shadow);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(40px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: var(--shadow);
+    transform: scale(0.95);
+    transition: transform 0.2s;
+  }
+
+  .modal-overlay.open .modal { transform: scale(1); }
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text2);
+  }
+  .empty .icon { font-size: 48px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; }
+
+  /* PRINT */
+  @media print {
+    body { background: #fff; color: #000; }
+    body::before { display: none; }
+    header, .tabs, .form-actions, .search-bar .btn, .btn-danger, .table-wrap .btn { display: none !important; }
+    .card { box-shadow: none; border-color: #ddd; }
+    th { background: #f0f0f0 !important; color: #333 !important; }
+    td { color: #000 !important; }
+    .badge-green { background: #e6ffe6 !important; color: #1a7a2e !important; }
+    .badge-red { background: #ffe6e6 !important; color: #b00020 !important; }
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 0 16px; }
+    main { padding: 20px 12px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .aluno-header { flex-direction: column; }
+  }
+</style>
 </head>
 <body>
-    <p>testando site</p>
-    <p>hoje é quinta</p>
 
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎓</div>
+    EduCadastro
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="exportCSV()">⬇ Exportar CSV</button>
+    <button class="btn btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+    <button class="btn btn-primary" onclick="novoAluno()">＋ Novo Aluno</button>
+  </div>
+</header>
+
+<main>
+  <!-- STATS -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card">
+      <div class="stat-label">Total de Alunos</div>
+      <div class="stat-value blue" id="totalAlunos">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ativos</div>
+      <div class="stat-value green" id="totalAtivos">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Inativos</div>
+      <div class="stat-value orange" id="totalInativos">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Turmas</div>
+      <div class="stat-value purple" id="totalTurmas">0</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('cadastro', this)">📝 Cadastro</button>
+    <button class="tab" onclick="showTab('lista', this)">📋 Lista de Alunos</button>
+  </div>
+
+  <!-- PANEL CADASTRO -->
+  <div class="panel active" id="panel-cadastro">
+    <div class="card">
+      <div class="card-title">Dados do Aluno</div>
+      <div class="aluno-header">
+        <div class="photo-upload" id="photoBox" onclick="document.getElementById('fotoInput').click()" title="Clique para adicionar foto">
+          <span style="font-size:28px">📷</span>
+          <span>Adicionar foto</span>
+          <input type="file" id="fotoInput" accept="image/*" onchange="previewFoto(this)">
+        </div>
+        <div class="form-grid" style="flex:1">
+          <div class="form-group half">
+            <label>Nome Completo *</label>
+            <input type="text" id="nome" placeholder="Ex: Maria da Silva" />
+          </div>
+          <div class="form-group">
+            <label>Matrícula</label>
+            <input type="text" id="matricula" placeholder="Gerado automaticamente" readonly style="color:var(--text2)" />
+          </div>
+          <div class="form-group">
+            <label>Data de Nascimento</label>
+            <input type="date" id="dataNasc" />
+          </div>
+          <div class="form-group">
+            <label>CPF</label>
+            <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)" />
+          </div>
+          <div class="form-group">
+            <label>RG</label>
+            <input type="text" id="rg" placeholder="00.000.000-0" />
+          </div>
+          <div class="form-group">
+            <label>Gênero</label>
+            <select id="genero">
+              <option value="">Selecionar...</option>
+              <option>Masculino</option>
+              <option>Feminino</option>
+              <option>Outro</option>
+              <option>Prefiro não informar</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Contato & Endereço</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="email" placeholder="aluno@email.com" />
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="text" id="tel" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)" />
+        </div>
+        <div class="form-group">
+          <label>CEP</label>
+          <input type="text" id="cep" placeholder="00000-000" maxlength="9" oninput="maskCEP(this)" />
+        </div>
+        <div class="form-group half">
+          <label>Endereço</label>
+          <input type="text" id="endereco" placeholder="Rua, número" />
+        </div>
+        <div class="form-group">
+          <label>Bairro</label>
+          <input type="text" id="bairro" placeholder="Bairro" />
+        </div>
+        <div class="form-group">
+          <label>Cidade</label>
+          <input type="text" id="cidade" placeholder="Cidade" />
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <select id="estado">
+            <option value="">Selecionar...</option>
+            <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+            <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+            <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+            <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+            <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+            <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+            <option>SP</option><option>SE</option><option>TO</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Dados Escolares</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Turma / Série</label>
+          <input type="text" id="turma" placeholder="Ex: 3º Ano A" />
+        </div>
+        <div class="form-group">
+          <label>Turno</label>
+          <select id="turno">
+            <option value="">Selecionar...</option>
+            <option>Matutino</option>
+            <option>Vespertino</option>
+            <option>Noturno</option>
+            <option>Integral</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ano Letivo</label>
+          <input type="number" id="anoLetivo" placeholder="2025" min="2000" max="2099" />
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="status">
+            <option value="Ativo">Ativo</option>
+            <option value="Inativo">Inativo</option>
+            <option value="Transferido">Transferido</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nome do Responsável</label>
+          <input type="text" id="responsavel" placeholder="Nome completo" />
+        </div>
+        <div class="form-group">
+          <label>Tel. Responsável</label>
+          <input type="text" id="telResp" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)" />
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <textarea id="obs" placeholder="Informações adicionais, necessidades especiais, etc."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="salvarAluno()">💾 Salvar Cadastro</button>
+      <button class="btn btn-ghost" onclick="novoAluno()">🔄 Limpar / Novo</button>
+      <button class="btn btn-orange" onclick="compartilhar()">↗ Compartilhar</button>
+      <button class="btn btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+    </div>
+  </div>
+
+  <!-- PANEL LISTA -->
+  <div class="panel" id="panel-lista">
+    <div class="search-bar">
+      <input type="text" id="busca" placeholder="🔍 Buscar por nome, matrícula ou turma..." oninput="renderTabela()" />
+      <select id="filtroStatus" onchange="renderTabela()" style="width:160px">
+        <option value="">Todos os status</option>
+        <option>Ativo</option>
+        <option>Inativo</option>
+        <option>Transferido</option>
+      </select>
+      <button class="btn btn-success" onclick="exportCSV()">⬇ CSV</button>
+      <button class="btn btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>Matrícula</th>
+            <th>Turma</th>
+            <th>Turno</th>
+            <th>Ano Letivo</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="emptyState" class="empty" style="display:none">
+        <div class="icon">🎒</div>
+        <p>Nenhum aluno cadastrado ainda.<br>Clique em <strong>Novo Aluno</strong> para começar.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL VISUALIZAR -->
+<div class="modal-overlay" id="modalView">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Detalhes do Aluno</div>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Fechar</button>
+      <button class="btn btn-orange" onclick="editarAluno()">✏️ Editar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast"></div>
+
+<script>
+let alunos = JSON.parse(localStorage.getItem('alunos') || '[]');
+let editandoId = null;
+let viewingId = null;
+
+function gerarMatricula() {
+  return 'MAT' + Date.now().toString().slice(-6);
+}
+
+// ----- TABS -----
+function showTab(tab, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  el.classList.add('active');
+  if (tab === 'lista') renderTabela();
+}
+
+// ----- FOTO -----
+function previewFoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const box = document.getElementById('photoBox');
+    box.innerHTML = `<img src="${e.target.result}" /><input type="file" id="fotoInput" accept="image/*" onchange="previewFoto(this)">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ----- MASKS -----
+function maskCPF(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  v = v.replace(/(\d{3})(\d)/,'$1.$2');
+  v = v.replace(/(\d{3})(\d)/,'$1.$2');
+  v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  el.value = v;
+}
+function maskTel(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  v = v.replace(/^(\d{2})(\d)/,'($1) $2');
+  v = v.replace(/(\d{5})(\d)/,'$1-$2');
+  el.value = v;
+}
+function maskCEP(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,8);
+  v = v.replace(/(\d{5})(\d)/,'$1-$2');
+  el.value = v;
+}
+
+// ----- NOVO -----
+function novoAluno() {
+  editandoId = null;
+  ['nome','matricula','dataNasc','cpf','rg','email','tel','cep','endereco','bairro','cidade','obs','responsavel','telResp','turma','anoLetivo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  ['genero','estado','turno','status'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = id === 'status' ? 'Ativo' : '';
+  });
+  document.getElementById('photoBox').innerHTML = `<span style="font-size:28px">📷</span><span>Adicionar foto</span><input type="file" id="fotoInput" accept="image/*" onchange="previewFoto(this)">`;
+  document.getElementById('matricula').value = gerarMatricula();
+  showTab('cadastro', document.querySelectorAll('.tab')[0]);
+  toast('✨ Formulário limpo para novo cadastro!', 'blue');
+}
+
+// ----- SALVAR -----
+function salvarAluno() {
+  const nome = document.getElementById('nome').value.trim();
+  if (!nome) { toast('⚠️ O nome do aluno é obrigatório!', 'orange'); return; }
+
+  const fotoImg = document.querySelector('#photoBox img');
+  const foto = fotoImg ? fotoImg.src : '';
+
+  const aluno = {
+    id: editandoId || Date.now(),
+    matricula: document.getElementById('matricula').value || gerarMatricula(),
+    foto,
+    nome,
+    dataNasc: document.getElementById('dataNasc').value,
+    cpf: document.getElementById('cpf').value,
+    rg: document.getElementById('rg').value,
+    genero: document.getElementById('genero').value,
+    email: document.getElementById('email').value,
+    tel: document.getElementById('tel').value,
+    cep: document.getElementById('cep').value,
+    endereco: document.getElementById('endereco').value,
+    bairro: document.getElementById('bairro').value,
+    cidade: document.getElementById('cidade').value,
+    estado: document.getElementById('estado').value,
+    turma: document.getElementById('turma').value,
+    turno: document.getElementById('turno').value,
+    anoLetivo: document.getElementById('anoLetivo').value,
+    status: document.getElementById('status').value,
+    responsavel: document.getElementById('responsavel').value,
+    telResp: document.getElementById('telResp').value,
+    obs: document.getElementById('obs').value,
+  };
+
+  if (editandoId) {
+    const idx = alunos.findIndex(a => a.id === editandoId);
+    if (idx !== -1) alunos[idx] = aluno;
+    toast('✅ Cadastro atualizado com sucesso!', 'green');
+  } else {
+    alunos.push(aluno);
+    toast('✅ Aluno cadastrado com sucesso!', 'green');
+  }
+
+  salvarStorage();
+  atualizarStats();
+  editandoId = null;
+  novoAluno();
+}
+
+// ----- TABELA -----
+function renderTabela() {
+  const busca = document.getElementById('busca').value.toLowerCase();
+  const filtro = document.getElementById('filtroStatus').value;
+  const tbody = document.getElementById('tbody');
+  const empty = document.getElementById('emptyState');
+
+  let lista = alunos.filter(a => {
+    const match = a.nome.toLowerCase().includes(busca) ||
+                  (a.matricula || '').toLowerCase().includes(busca) ||
+                  (a.turma || '').toLowerCase().includes(busca);
+    const statusOk = !filtro || a.status === filtro;
+    return match && statusOk;
+  });
+
+  if (lista.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  tbody.innerHTML = lista.map(a => {
+    const initials = a.nome.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+    const badge = a.status === 'Ativo' ? 'green' : a.status === 'Inativo' ? 'red' : 'blue';
+    return `<tr>
+      <td><div class="name-cell">
+        ${a.foto ? `<img src="${a.foto}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-right:10px;flex-shrink:0">` : `<div class="avatar">${initials}</div>`}
+        ${a.nome}
+      </div></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2)">${a.matricula}</td>
+      <td>${a.turma || '—'}</td>
+      <td>${a.turno || '—'}</td>
+      <td>${a.anoLetivo || '—'}</td>
+      <td><span class="badge badge-${badge}">${a.status}</span></td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="verAluno(${a.id})">👁 Ver</button>
+        <button class="btn btn-orange" style="padding:5px 10px;font-size:12px" onclick="editarId(${a.id})">✏️</button>
+        <button class="btn btn-danger" style="padding:5px 10px;font-size:12px" onclick="excluirAluno(${a.id})">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ----- VER -----
+function verAluno(id) {
+  const a = alunos.find(x => x.id === id);
+  if (!a) return;
+  viewingId = id;
+  document.getElementById('modalTitle').textContent = a.nome;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:16px">
+      ${a.foto ? `<img src="${a.foto}" style="width:72px;height:88px;border-radius:10px;object-fit:cover;flex-shrink:0">` : `<div style="width:72px;height:88px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;flex-shrink:0">${a.nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}</div>`}
+      <div style="flex:1">
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px">${a.nome}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2)">${a.matricula}</div>
+        <div style="margin-top:6px"><span class="badge badge-${a.status==='Ativo'?'green':a.status==='Inativo'?'red':'blue'}">${a.status}</span></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    ${row('📅 Nascimento', a.dataNasc || '—')}
+    ${row('🪪 CPF', a.cpf || '—')}
+    ${row('📧 E-mail', a.email || '—')}
+    ${row('📞 Telefone', a.tel || '—')}
+    ${row('📍 Endereço', [a.endereco, a.bairro, a.cidade, a.estado].filter(Boolean).join(', ') || '—')}
+    <div class="divider"></div>
+    ${row('🏫 Turma', a.turma || '—')}
+    ${row('⏰ Turno', a.turno || '—')}
+    ${row('📆 Ano Letivo', a.anoLetivo || '—')}
+    ${row('👨‍👩‍👧 Responsável', a.responsavel || '—')}
+    ${row('📱 Tel. Responsável', a.telResp || '—')}
+    ${a.obs ? `<div class="divider"></div>${row('📝 Observações', a.obs)}` : ''}
+  `;
+  document.getElementById('modalView').classList.add('open');
+}
+
+function row(label, value) {
+  return `<div style="display:flex;gap:8px;margin-bottom:8px;font-size:13px">
+    <span style="color:var(--text2);min-width:140px">${label}</span>
+    <span>${value}</span>
+  </div>`;
+}
+
+function closeModal() {
+  document.getElementById('modalView').classList.remove('open');
+}
+
+function editarAluno() {
+  closeModal();
+  if (viewingId) editarId(viewingId);
+}
+
+function editarId(id) {
+  const a = alunos.find(x => x.id === id);
+  if (!a) return;
+  editandoId = id;
+  Object.keys(a).forEach(key => {
+    const el = document.getElementById(key);
+    if (el && key !== 'foto' && key !== 'id') el.value = a[key] || '';
+  });
+  if (a.foto) {
+    document.getElementById('photoBox').innerHTML = `<img src="${a.foto}" /><input type="file" id="fotoInput" accept="image/*" onchange="previewFoto(this)">`;
+  }
+  showTab('cadastro', document.querySelectorAll('.tab')[0]);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  toast('✏️ Modo de edição ativado!', 'blue');
+}
+
+// ----- EXCLUIR -----
+function excluirAluno(id) {
+  if (!confirm('Tem certeza que deseja excluir este aluno?')) return;
+  alunos = alunos.filter(a => a.id !== id);
+  salvarStorage();
+  atualizarStats();
+  renderTabela();
+  toast('🗑 Aluno excluído!', 'red');
+}
+
+// ----- STATS -----
+function atualizarStats() {
+  document.getElementById('totalAlunos').textContent = alunos.length;
+  document.getElementById('totalAtivos').textContent = alunos.filter(a => a.status === 'Ativo').length;
+  document.getElementById('totalInativos').textContent = alunos.filter(a => a.status === 'Inativo').length;
+  const turmas = new Set(alunos.map(a => a.turma).filter(Boolean));
+  document.getElementById('totalTurmas').textContent = turmas.size;
+}
+
+// ----- STORAGE -----
+function salvarStorage() {
+  localStorage.setItem('alunos', JSON.stringify(alunos));
+}
+
+// ----- EXPORT CSV -----
+function exportCSV() {
+  if (alunos.length === 0) { toast('⚠️ Nenhum aluno para exportar!', 'orange'); return; }
+  const headers = ['Matrícula','Nome','CPF','Nascimento','Gênero','E-mail','Telefone','Turma','Turno','Ano Letivo','Status','Responsável','Cidade','Estado'];
+  const rows = alunos.map(a => [
+    a.matricula, a.nome, a.cpf, a.dataNasc, a.genero, a.email, a.tel,
+    a.turma, a.turno, a.anoLetivo, a.status, a.responsavel, a.cidade, a.estado
+  ].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `alunos_${new Date().toISOString().slice(0,10)}.csv`;
+  link.click();
+  toast('✅ CSV exportado com sucesso!', 'green');
+}
+
+// ----- COMPARTILHAR -----
+function compartilhar() {
+  const texto = `Cadastro de Aluno\n\nNome: ${document.getElementById('nome').value || '—'}\nMatrícula: ${document.getElementById('matricula').value || '—'}\nTurma: ${document.getElementById('turma').value || '—'}\nStatus: ${document.getElementById('status').value || '—'}`;
+  if (navigator.share) {
+    navigator.share({ title: 'Cadastro de Aluno', text: texto });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(texto);
+    toast('📋 Dados copiados para a área de transferência!', 'blue');
+  } else {
+    prompt('Copie os dados do aluno:', texto);
+  }
+}
+
+// ----- TOAST -----
+function toast(msg, type) {
+  type = type || 'green';
+  var colorMap = { green: '#3fb950', blue: '#4f9cf9', red: '#f85149', orange: '#e3a84e' };
+  var el = document.createElement('div');
+  el.className = 'toast-item';
+  el.innerHTML = msg;
+  el.style.borderLeft = '3px solid ' + (colorMap[type] || colorMap.green);
+  document.getElementById('toast').appendChild(el);
+  setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3500);
+}
+
+// ----- INIT -----
+window.onload = function() {
+  document.getElementById('matricula').value = gerarMatricula();
+  atualizarStats();
+  document.getElementById('modalView').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+};
+</script>
 </body>
 </html>
